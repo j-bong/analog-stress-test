@@ -1,0 +1,38 @@
+# CMD: CUDA_VISIBLE_DEVICES=2 PYTHONPATH=/home/bong/analog_stress_test/analog-training SEED=2 python NeurIPS-2025/S2-mnist-CNN.py --CUDA 0 --SETTING Analog SGD --RPU Pow --tau 0.7 --res-gamma 0.5 --res-state 14
+[2026-05-19 22:35:36,782] Epoch 0 - Training loss: --------   Test Accuracy: 0.1289
+[2026-05-19 22:36:46,290] Epoch 1 - Training loss: 1.633354   Test Accuracy: 0.1032
+[2026-05-19 22:37:51,490] Epoch 2 - Training loss: 2.300292   Test Accuracy: 0.1028
+[2026-05-19 22:38:57,500] Epoch 3 - Training loss: 2.303351   Test Accuracy: 0.1135
+[2026-05-19 22:39:59,287] Epoch 4 - Training loss: 2.303325   Test Accuracy: 0.1135
+[2026-05-19 22:41:04,708] Epoch 5 - Training loss: 2.303510   Test Accuracy: 0.1247
+[2026-05-19 22:42:13,296] Epoch 6 - Training loss: 2.303651   Test Accuracy: 0.1135
+[2026-05-19 22:43:19,828] Epoch 7 - Training loss: 2.303187   Test Accuracy: 0.0980
+[2026-05-19 22:44:28,943] Epoch 8 - Training loss: 2.302814   Test Accuracy: 0.1135
+[2026-05-19 22:45:39,525] Epoch 9 - Training loss: 2.303127   Test Accuracy: 0.1135
+[2026-05-19 22:46:50,690] Epoch 10 - Training loss: 2.303304   Test Accuracy: 0.0958
+[2026-05-19 22:47:55,752] Epoch 11 - Training loss: 2.303553   Test Accuracy: 0.1135
+[2026-05-19 22:49:10,403] Epoch 12 - Training loss: 2.303148   Test Accuracy: 0.1135
+[2026-05-19 22:50:17,619] Epoch 13 - Training loss: 2.303196   Test Accuracy: 0.1135
+[2026-05-19 22:51:19,328] Epoch 14 - Training loss: 2.303138   Test Accuracy: 0.1135
+[2026-05-19 22:52:15,861] Epoch 15 - Training loss: 2.303579   Test Accuracy: 0.1135
+[2026-05-19 22:53:18,043] Epoch 16 - Training loss: 2.303188   Test Accuracy: 0.0980
+[2026-05-19 22:54:19,155] Epoch 17 - Training loss: 2.303297   Test Accuracy: 0.1032
+[2026-05-19 22:55:15,853] Epoch 18 - Training loss: 2.303140   Test Accuracy: 0.1135
+[2026-05-19 22:56:18,604] Epoch 19 - Training loss: 2.303451   Test Accuracy: 0.1010
+[2026-05-19 22:57:21,791] Epoch 20 - Training loss: 2.303149   Test Accuracy: 0.1010
+[2026-05-19 22:58:26,757] Epoch 21 - Training loss: 2.303202   Test Accuracy: 0.1135
+[2026-05-19 22:59:31,955] Epoch 22 - Training loss: 2.303251   Test Accuracy: 0.1135
+[2026-05-19 23:00:38,274] Epoch 23 - Training loss: 2.303241   Test Accuracy: 0.1135
+[2026-05-19 23:01:48,603] Epoch 24 - Training loss: 2.303192   Test Accuracy: 0.1135
+[2026-05-19 23:02:54,824] Epoch 25 - Training loss: 2.302991   Test Accuracy: 0.1028
+[2026-05-19 23:04:02,334] Epoch 26 - Training loss: 2.303036   Test Accuracy: 0.1135
+[2026-05-19 23:04:56,491] Epoch 27 - Training loss: 2.302939   Test Accuracy: 0.1135
+[2026-05-19 23:05:52,618] Epoch 28 - Training loss: 2.302806   Test Accuracy: 0.1028
+[2026-05-19 23:06:58,782] Epoch 29 - Training loss: 2.302932   Test Accuracy: 0.1135
+[2026-05-19 23:08:04,482] Epoch 30 - Training loss: 2.303176   Test Accuracy: 0.1135
+aihwkit path:  /home/bong/analog_stress_test/aihwkit-fork/src/aihwkit/__init__.py
+NeurIPS-2025/S2-mnist-CNN.py --CUDA 0 --SETTING Analog SGD --RPU Pow --tau 0.7 --res-gamma 0.5 --res-state 14
+Using Device:  cuda:0
+Logging to file: runs/MNIST-CNN/Pow-gamma=0.5-state=14/Analog SGD-tau=0.7/events.out.tfevents.1779197730.user.2213829.0
+
+Training Time (s) = 1951.5358474254608
