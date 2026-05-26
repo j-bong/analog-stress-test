@@ -1,0 +1,186 @@
+# Patch against upstream Zhaoxian-Wu/analog-training @ 92f26cce
+# File: NeurIPS-2025/S2-mnist-FCN.py
+# Applies: seed control + IOParameters env-var wiring + alpha=0.05, beta=0.01 hyperparams
+
+--- a/NeurIPS-2025/S2-mnist-FCN.py
++++ b/NeurIPS-2025/S2-mnist-FCN.py
+@@ -22,6 +22,13 @@
+ from enum import Enum
+ 
+ import torch
++import os as _os, random as _random
++import numpy as _np
++_seed = int(_os.environ.get("SEED", "0"))
++torch.manual_seed(_seed)
++torch.cuda.manual_seed_all(_seed)
++_np.random.seed(_seed)
++_random.seed(_seed)
+ from torch import nn
+ from torch.optim.lr_scheduler import StepLR
+ from torchvision import datasets, transforms
+@@ -29,6 +36,21 @@
+ import sys
+ # sys.path.insert(0, '../aihwkit/src/')
+ import aihwkit
++
++def _io():
++    import os as _os
++    from aihwkit.simulator.parameters.io import IOParameters
++    p = IOParameters()
++    _r = float(_os.environ.get("INP_RES", "-1"))
++    _R = float(_os.environ.get("OUT_RES", "-1"))
++    _n = float(_os.environ.get("INP_NOISE", "-1"))
++    _N = float(_os.environ.get("OUT_NOISE", "-1"))
++    if _r > 0: p.inp_res = _r
++    if _R > 0: p.out_res = _R
++    if _n >= 0: p.inp_noise = _n
++    if _N >= 0: p.out_noise = _N
++    return p
++
+ print('aihwkit path: ', aihwkit.__file__)
+ 
+ from utils.logger import Logger
+@@ -400,10 +422,14 @@
+         rpu_config = SingleRPUConfig(
+             device=get_RPU_device(RPU_NAME)
+         )
++        # apply Axis 4 IO env vars to MAIN forward/backward too
++        rpu_config.forward = _io()
++        rpu_config.backward = _io()
++
+         config = {
+             'name': 'Analog SGD',
+             'rpu_config': rpu_config,
+-            'optimizer_cls': get_AnalogSGD_optimizer_generator(),
++            'optimizer_cls': get_AnalogSGD_optimizer_generator(lr=0.05),
+             'grad_per_iter': 1,
+             'batch_size': BATCH_SIZE,
+         }
+@@ -415,13 +441,19 @@
+         rpu_config = build_config(algorithm, device=device_config_fit, construction_seed=123)
+         rpu_config.mapping.learn_out_scaling = True
+         rpu_config.mapping.weight_scaling_columnwise = True
+-        rpu_config.device.fast_lr = 0.01
++        # α=0.05, β=0.01
++        rpu_config.device.fast_lr = 1.0
++        rpu_config.device.transfer_lr = 0.2
+         rpu_config.device.n_reads_per_transfer = 1
+         
++        # apply Axis 4 IO env vars to MAIN forward/backward too
++        rpu_config.forward = _io()
++        rpu_config.backward = _io()
++
+         config = {
+             'name': f'TT-v1',
+             'rpu_config': rpu_config,
+-            'optimizer_cls': get_AnalogSGD_optimizer_generator(lr=lr),
++            'optimizer_cls': get_AnalogSGD_optimizer_generator(lr=0.05),
+             'grad_per_iter': 1,
+             'batch_size': BATCH_SIZE,
+         }
+@@ -449,24 +481,29 @@
+                 auto_scale=False,
+                 construction_seed=123,
+             ),
+-            forward=IOParameters(),
+-            backward=IOParameters(),
++            forward=_io(),
++            backward=_io(),
+             update=UpdateParameters(desired_bl=5),
+         )
+         rpu_config.mapping.learn_out_scaling = True
+         rpu_config.mapping.weight_scaling_columnwise = True
+         rpu_config.mapping.weight_scaling_omega = 0.3
+         
+-        rpu_config.device.fast_lr = 0.01
++        # α=0.05, β=0.01
++        rpu_config.device.fast_lr = 0.05
+         rpu_config.device.scale_fast_lr = False
+-        rpu_config.device.transfer_lr = 1
++        rpu_config.device.transfer_lr = 0.2
+         rpu_config.device.scale_transfer_lr = True
+         rpu_config.device.auto_granularity = 1000
+         
++        # apply Axis 4 IO env vars to MAIN forward/backward too
++        rpu_config.forward = _io()
++        rpu_config.backward = _io()
++
+         config = {
+             'name': f'TT-v2',
+             'rpu_config': rpu_config,
+-            'optimizer_cls': get_AnalogSGD_optimizer_generator(lr=lr),
++            'optimizer_cls': get_AnalogSGD_optimizer_generator(lr=0.05),
+             'grad_per_iter': 1,
+             'batch_size': BATCH_SIZE,
+         }
+@@ -487,26 +524,31 @@
+                 auto_scale=False,
+                 construction_seed=123,
+             ),
+-            forward=IOParameters(),
+-            backward=IOParameters(),
++            forward=_io(),
++            backward=_io(),
+             update=UpdateParameters(desired_bl=5),
+         )
+         rpu_config.mapping.learn_out_scaling = True
+         rpu_config.mapping.weight_scaling_columnwise = True
+         rpu_config.mapping.weight_scaling_omega = 0.3
+         
+-        rpu_config.device.buffer_as_momentum = True
+         rpu_config.device.momentum = 0.9
+         rpu_config.device.fast_lr = 1
+         rpu_config.device.scale_fast_lr = True
+-        rpu_config.device.transfer_lr = 0.11 + 1 / num_of_states
++        # β=0.01
++        rpu_config.device.transfer_lr = 0.01
+         rpu_config.device.scale_transfer_lr = False
+         rpu_config.device.auto_granularity = 100
++        rpu_config.device.gamma = 0.4
+         
++        # apply Axis 4 IO env vars to MAIN forward/backward too
++        rpu_config.forward = _io()
++        rpu_config.backward = _io()
++
+         config = {
+             'name': f'RL-v2',
+             'rpu_config': rpu_config,
+-            'optimizer_cls': get_AnalogSGD_optimizer_generator(lr=lr),
++            'optimizer_cls': get_AnalogSGD_optimizer_generator(lr=0.05),
+             'grad_per_iter': 1,
+             'batch_size': BATCH_SIZE,
+         }
+@@ -531,7 +573,7 @@
+         config = {
+             'name': f'TT-v3',
+             'rpu_config': rpu_config,
+-            'optimizer_cls': get_AnalogSGD_optimizer_generator(lr=lr),
++            'optimizer_cls': get_AnalogSGD_optimizer_generator(lr=0.05),
+             'grad_per_iter': 1,
+             'batch_size': BATCH_SIZE,
+         }
+@@ -552,7 +594,7 @@
+         config = {
+             'name': f'TT-v4',
+             'rpu_config': rpu_config,
+-            'optimizer_cls': get_AnalogSGD_optimizer_generator(lr=lr),
++            'optimizer_cls': get_AnalogSGD_optimizer_generator(lr=0.05),
+             'grad_per_iter': 1,
+             'batch_size': BATCH_SIZE,
+         }
+@@ -564,7 +606,7 @@
+         config = {
+             'name': f'mp',
+             'rpu_config': rpu_config,
+-            'optimizer_cls': get_AnalogSGD_optimizer_generator(lr=lr),
++            'optimizer_cls': get_AnalogSGD_optimizer_generator(lr=0.05),
+             'grad_per_iter': 1,
+             'batch_size': BATCH_SIZE,
+         }
+@@ -609,4 +651,4 @@
+                               rpu_config=rpu_config)
+ 
+ # Train the model.
+-train(model, train_dataset, config, logger, check_point_path)
+\ No newline at end of file
++train(model, train_dataset, config, logger, check_point_path)
