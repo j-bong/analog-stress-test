@@ -7,6 +7,16 @@ Sweep + analysis code for an internal stress-test on analog in-memory training.
     scripts/   sweep runners and plotting code
     logs/      raw .log per run, grouped by axis/algorithm
 
+## Figures
+
+Pre-rendered figures from the report are under `figures/`:
+
+    figures/device_curves/                 16 per-device pulse-response plots
+    figures/sweep_results/                 8 per-axis result plots + 2 overviews
+    figures/library_default_comparison/    6 library-default vs calibrated plots
+
+See `figures/README.md` for details. All figures regenerate from the .log files via the plotting scripts in `scripts/`.
+
 ## Running a sweep
 
 The sweep drivers shell out to the upstream training scripts in
